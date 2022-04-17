@@ -34,7 +34,7 @@ def parse_xyz_fm(podcast_url):
         d = {
             "title": show_title,
             "audio": show_audio,
-            "date": date_published,
+            "accessDate": date_published,
             "series": series,
             "homepage": series_homepage,
             "url": j["url"],
