@@ -48,14 +48,15 @@ def parse_xyz_fm(podcast_url):
 
 
 def parse_weixin(url):
+    # 微信公众号文章
     page = requests.get(url)
     soup = BeautifulSoup(page.content, 'lxml')
     d = {}
-    d['author'] = soup.find('meta', {'name': 'author'})['content']  # 作者的名字
+    d['author'] = soup.find('meta', {'name': 'author'})['content']  # 作者的名字，跟公众号的名称可能不一样
     d['title'] = soup.find('meta', {'property': 'og:title'})['content']
     d['desc'] = soup.find('meta', {'name': 'description'})['content']
     d['site_name'] = soup.find('meta', {'property': 'og:site_name'})['content']
-    d['weixin_name'] = soup.find('a', {'id': 'js_name'}).text.strip()  # 公众号的名称
+    d['profile_name'] = soup.find('a', {'id': 'js_name'}).text.strip()  # 公众号的名称
     p_re = re.compile(
         '0,\"(\d+)\",0,document.getElementById\(\"publish_time\"\)')
     m = p_re.search(page.text)
@@ -90,14 +91,14 @@ def resp(platform):
     elif platform == 'weixin':
         d = parse_weixin(url)
         app.logger.info(d)
-        webpage = zot.item_template('webpage')
+        webpage = zot.item_template('blogPost')
         webpage['title'] = d['title']
         webpage['abstractNote'] = d['desc']
         webpage['url'] = url
         webpage['collections'] = [zotero_config["zotero_collection"]]
-        webpage['websiteTitle'] = d['weixin_name']
+        webpage['rights'] = '微信公众平台' + '-' + d['profile_name']   # 微信公众平台-公众号名称
         webpage['websiteType'] = '微信公众平台'
-        webpage['creators'][0]['firstName'] = d['author']
+        webpage['creators'][0]['lastName'] = d['author']
         webpage['date'] = d['publish_time']
         zot_resp = zot.create_items([webpage])
 
